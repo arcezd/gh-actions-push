@@ -51,6 +51,11 @@ jobs:
 | directory      | string  | '.'                         | Directory to change to before pushing. |
 | repository     | string  | ''                          | Repository name. Default or empty repository name represents current github repository. If you want to push to other repository, you should make a [personal access token](https://github.com/settings/tokens) and use it as the `github_token` input.  |
 
+### Outputs
+| name           | value   | default                     | description |
+| -------------- | ------  | --------------------------- | ----------- |
+| no_changes     | boolean |                             | True if no changes were made in the repository. |
+
 ## License
 
 The Dockerfile and associated scripts and documentation in this project are released under the [MIT License](LICENSE).

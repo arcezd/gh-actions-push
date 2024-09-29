@@ -17,6 +17,21 @@ INPUT_EMPTY=${INPUT_EMPTY:-false}
 INPUT_DIRECTORY=${INPUT_DIRECTORY:-'.'}
 REPOSITORY=${INPUT_REPOSITORY:-$GITHUB_REPOSITORY}
 
+echo_gh() {
+    if [ -n "$CI" ]; then
+        echo "$1"
+        echo "$1" >> "$GITHUB_STEP_SUMMARY"
+    else
+        echo "$1"
+    fi
+}
+
+send_output() {
+    if [ -n "$CI" ]; then
+        echo "$1=$2" >> "$GITHUB_OUTPUT"
+    fi
+}
+
 echo "Push to branch $INPUT_BRANCH";
 [ -z "${INPUT_GITHUB_TOKEN}" ] && {
     echo 'Missing input "github_token: ${{ secrets.GITHUB_TOKEN }}".';
@@ -48,6 +63,17 @@ git config --local user.email "${INPUT_AUTHOR_EMAIL}"
 git config --local user.name "${INPUT_AUTHOR_NAME}"
 
 git add -A
+
+# check if there are any changes to commit
+if git diff-index --quiet HEAD --; then
+    echo_gh "No changes to commit"
+    send_output "no_changes" "true"
+    if [ -z "$_EMPTY" ]; then
+        exit 0
+    fi
+else
+    send_output "no_changes" "false"
+fi
 
 if ${INPUT_AMEND}; then
     if [ -n "${INPUT_COAUTHOR_EMAIL}" ] && [ -n "${INPUT_COAUTHOR_NAME}" ]; then
